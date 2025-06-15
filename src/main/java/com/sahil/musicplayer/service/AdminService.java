@@ -1,6 +1,7 @@
 package com.sahil.musicplayer.service;
 
 import com.sahil.musicplayer.dto.DashboardStats;
+import com.sahil.musicplayer.exception.UserNotFoundException;
 import com.sahil.musicplayer.model.User;
 import com.sahil.musicplayer.repository.SongRepository;
 import com.sahil.musicplayer.repository.UserRepository;
@@ -45,7 +46,7 @@ public class AdminService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
                     log.warn("Attempted to toggle status for non-existing user with id: {}", userId);
-                    return new RuntimeException("User not found with id: " + userId);
+                    return new UserNotFoundException("User not found with id: " + userId);
                 });
 
         user.setEnabled(!user.isEnabled());
@@ -59,7 +60,7 @@ public class AdminService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
                     log.warn("Attempted to delete non-existing user with id: {}", userId);
-                    return new RuntimeException("User not found with id: " + userId);
+                    return  new UserNotFoundException("User not found with id: " + userId);
                 });
 
         userRepository.delete(user);

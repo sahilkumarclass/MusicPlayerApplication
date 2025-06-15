@@ -2,6 +2,7 @@ package com.sahil.musicplayer.service;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.sahil.musicplayer.exception.SongNotFoundException;
 import com.sahil.musicplayer.model.Song;
 import com.sahil.musicplayer.repository.SongRepository;
 import lombok.RequiredArgsConstructor;
@@ -62,7 +63,7 @@ public class SongServiceImpl implements SongService {
     @Cacheable(value = "song", key = "#id")
     public Song getSongById(String id) {
         return songRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Song not found with id: " + id));
+                .orElseThrow(() -> new SongNotFoundException("Song not found with id: " + id));
     }
 
     @Override
@@ -78,7 +79,7 @@ public class SongServiceImpl implements SongService {
                 })
                 .orElseThrow(() -> {
                     log.warn("Attempted to update a non-existing song with id: {}", id);
-                    return new RuntimeException("Song not found with id: " + id);
+                    return new SongNotFoundException("Song not found with id: " + id);
                 });
     }
 
@@ -89,7 +90,7 @@ public class SongServiceImpl implements SongService {
         Song song = songRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("Attempted to delete a non-existing song with id: {}", id);
-                    return new RuntimeException("Song not found with id: " + id);
+                    return new SongNotFoundException("Song not found with id: " + id);
                 });
 
         String publicId = song.getPublicId();
@@ -114,7 +115,7 @@ public class SongServiceImpl implements SongService {
         Song song = songRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("Attempted to toggle favorite for non-existing song with id: {}", id);
-                    return new RuntimeException("Song not found with id: " + id);
+                    return new SongNotFoundException("Song not found with id: " + id);
                 });
 
         song.setFavorite(!song.isFavorite());
