@@ -8,6 +8,7 @@ import com.sahil.musicplayer.repository.SongRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +28,7 @@ public class SongServiceImpl implements SongService {
 
     @Override
     @Transactional
-    @CacheEvict(value = "songs", allEntries = true)
+    @CacheEvict(value = { "songs", "song" }, allEntries = true)
     public Song uploadSong(MultipartFile file, String title, String artist) {
         String filename = file.getOriginalFilename();
         if (file.isEmpty() || filename == null || !filename.toLowerCase().endsWith(".mp3")) {
@@ -54,20 +55,23 @@ public class SongServiceImpl implements SongService {
     }
 
     @Override
-    @Cacheable("songs")
+    @Cacheable(value = "songs", key = "'all'", unless = "#result.isEmpty()")
     public List<Song> getAllSongs() {
+        log.debug("Fetching all songs from database");
         return songRepository.findAll();
     }
 
     @Override
-    @Cacheable(value = "song", key = "#id")
+    @Cacheable(value = "song", key = "#id", unless = "#result == null")
     public Song getSongById(String id) {
+        log.debug("Fetching song with id: {} from database", id);
         return songRepository.findById(id)
                 .orElseThrow(() -> new SongNotFoundException("Song not found with id: " + id));
     }
 
     @Override
     @Transactional
+    @CachePut(value = "song", key = "#id")
     @CacheEvict(value = "songs", allEntries = true)
     public Song updateSong(String id, Song updatedSong) {
         return songRepository.findById(id)
@@ -85,7 +89,7 @@ public class SongServiceImpl implements SongService {
 
     @Override
     @Transactional
-    @CacheEvict(value = "songs", allEntries = true)
+    @CacheEvict(value = { "songs", "song" }, allEntries = true)
     public void deleteSong(String id) {
         Song song = songRepository.findById(id)
                 .orElseThrow(() -> {
@@ -110,6 +114,7 @@ public class SongServiceImpl implements SongService {
 
     @Override
     @Transactional
+    @CachePut(value = "song", key = "#id")
     @CacheEvict(value = "songs", allEntries = true)
     public void toggleFavorite(String id) {
         Song song = songRepository.findById(id)

@@ -67,13 +67,13 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
     private Bandwidth getBandwidthForPath(String path) {
         if (path.startsWith("/api/auth/")) {
-            return RateLimitConfig.RateLimit.AUTH_BANDWIDTH;
+            return RedisConfig.RateLimit.AUTH_BANDWIDTH;
         } else if (path.contains("/upload")) {
-            return RateLimitConfig.RateLimit.UPLOAD_BANDWIDTH;
+            return RedisConfig.RateLimit.UPLOAD_BANDWIDTH;
         } else if (path.startsWith("/api/admin/")) {
-            return RateLimitConfig.RateLimit.ADMIN_BANDWIDTH;
+            return RedisConfig.RateLimit.ADMIN_BANDWIDTH;
         } else {
-            return RateLimitConfig.RateLimit.GENERAL_BANDWIDTH;
+            return RedisConfig.RateLimit.GENERAL_BANDWIDTH;
         }
     }
 
