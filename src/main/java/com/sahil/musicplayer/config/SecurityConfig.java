@@ -35,6 +35,7 @@ public class SecurityConfig {
     private static final String ROLE_ADMIN = "ADMIN";
     private final UserRepository userRepository;
     private final JwtService jwtService;
+    private final RateLimitFilter rateLimitFilter;
 
     @Bean
     public UserDetailsService userDetailsService() {
@@ -72,14 +73,15 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/health").permitAll()
                         .requestMatchers("/api/songs/upload").hasRole(ROLE_ADMIN)
                         .requestMatchers("/api/songs/{id}").hasAnyRole(ROLE_ADMIN, "USER")
                         .requestMatchers("/api/songs").hasAnyRole(ROLE_ADMIN, "USER")
                         .requestMatchers("/api/admin/**").hasRole(ROLE_ADMIN)
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
+                .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

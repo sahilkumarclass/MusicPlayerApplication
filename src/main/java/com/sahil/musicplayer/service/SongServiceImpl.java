@@ -29,16 +29,16 @@ public class SongServiceImpl implements SongService {
     @Transactional
     @CacheEvict(value = "songs", allEntries = true)
     public Song uploadSong(MultipartFile file, String title, String artist) {
-        if (file.isEmpty() || !file.getOriginalFilename().toLowerCase().endsWith(".mp3")) {
+        String filename = file.getOriginalFilename();
+        if (file.isEmpty() || filename == null || !filename.toLowerCase().endsWith(".mp3")) {
             throw new IllegalArgumentException("Only .mp3 files are allowed.");
         }
         try {
             Map<?, ?> uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
-                    "resource_type", "auto"
-            ));
+                    "resource_type", "auto"));
 
             Song song = Song.builder()
-                    .fileName(file.getOriginalFilename())
+                    .fileName(filename)
                     .title(title)
                     .artist(artist)
                     .url((String) uploadResult.get("secure_url"))
