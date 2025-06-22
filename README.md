@@ -1,549 +1,280 @@
-# Music Player API
+# 🎵 Music Player Application
 
-A comprehensive REST API for a music streaming application built with Spring Boot, featuring JWT authentication, role-based access control, file upload capabilities, and Redis caching for optimal performance.
+A full-stack music player application built with Spring Boot (Backend) and React + TypeScript (Frontend).
 
-## Table of Contents
-- [Features](#features)
-- [Technology Stack](#technology-stack)
-- [Getting Started](#getting-started)
-- [Authentication](#authentication)
-- [API Endpoints](#api-endpoints)
-- [Redis Caching](#redis-caching)
-- [Security](#security)
-- [Error Handling](#error-handling)
-- [Frontend Integration](#frontend-integration)
-- [Environment Configuration](#environment-configuration)
-- [Contributing](#contributing)
+## 🚀 Features
 
-## Features
+### Backend (Spring Boot)
+- **Authentication & Authorization**: JWT-based authentication with role-based access (USER/ADMIN)
+- **Song Management**: Upload, play, update, delete, and favorite songs
+- **User Management**: Admin can manage users (enable/disable, delete)
+- **Caching**: Redis integration for improved performance
+- **Rate Limiting**: API rate limiting with configurable limits
+- **File Storage**: Cloudinary integration for song file storage
+- **Health Monitoring**: System health checks and cache statistics
+- **API Documentation**: Swagger/OpenAPI documentation
 
-- 🔐 **JWT Authentication** - Secure token-based authentication
-- 👥 **Role-Based Access Control** - Admin and User roles with different permissions
-- 🎵 **Song Management** - Upload, update, delete, and stream music files
-- ❤️ **Favorites System** - Users can mark songs as favorites
-- 🚀 **Redis Caching** - High-performance caching for frequently accessed data
-- ☁️ **Cloud Storage** - Cloudinary integration for file storage
-- 🔒 **Password Encryption** - BCrypt password hashing
-- 🌐 **CORS Support** - Frontend integration ready
+### Frontend (React + TypeScript)
+- **Modern UI**: Beautiful, responsive design with Tailwind CSS
+- **Authentication**: Login/Register with form validation
+- **Music Player**: Full-featured audio player with controls
+- **Song Library**: Browse, search, and manage songs
+- **Favorites**: Add/remove songs from favorites
+- **Admin Dashboard**: Statistics and user management (Admin only)
+- **Dark Mode**: Built-in dark/light theme support
+- **Real-time Updates**: React Query for efficient data fetching
 
-## Technology Stack
+## 🛠️ Tech Stack
 
-- **Backend**: Spring Boot 2.x
-- **Database**: MongoDB
-- **Caching**: Redis
-- **Authentication**: JWT (JSON Web Tokens)
-- **File Storage**: Cloudinary
-- **Security**: Spring Security
-- **Password Hashing**: BCrypt
+### Backend
+- **Java 17**
+- **Spring Boot 3.x**
+- **Spring Security** with JWT
+- **Spring Data MongoDB**
+- **Redis** for caching
+- **Cloudinary** for file storage
+- **Maven** for dependency management
 
-## Getting Started
+### Frontend
+- **React 18**
+- **TypeScript**
+- **Vite** for build tooling
+- **Tailwind CSS** for styling
+- **React Router** for navigation
+- **React Query** for state management
+- **React Hook Form** for forms
+- **Lucide React** for icons
+- **React Hot Toast** for notifications
+
+## 📁 Project Structure
+
+```
+MusicPlayerApplication/
+├── src/                          # Spring Boot Backend
+│   ├── main/java/com/sahil/musicplayer/
+│   │   ├── controllers/          # REST API endpoints
+│   │   ├── service/              # Business logic
+│   │   ├── repository/           # Data access layer
+│   │   ├── model/                # Entity classes
+│   │   ├── dto/                  # Data transfer objects
+│   │   ├── config/               # Configuration classes
+│   │   ├── exception/            # Custom exceptions
+│   │   └── aspect/               # AOP aspects
+│   └── resources/
+│       └── application.properties
+├── frontend/                     # React Frontend
+│   ├── src/
+│   │   ├── components/           # React components
+│   │   │   ├── auth/            # Authentication components
+│   │   │   ├── common/          # Shared components
+│   │   │   ├── player/          # Music player components
+│   │   │   ├── user/            # User-specific components
+│   │   │   └── admin/           # Admin components
+│   │   ├── pages/               # Page components
+│   │   ├── context/             # React contexts
+│   │   ├── services/            # API services
+│   │   ├── types/               # TypeScript types
+│   │   └── App.tsx              # Main app component
+│   ├── package.json
+│   └── tailwind.config.js
+└── README.md
+```
+
+## 🚀 Quick Start
 
 ### Prerequisites
-
-- Java 8 or higher
-- Maven 3.6+
+- Java 17 or higher
+- Node.js 18 or higher
 - MongoDB
 - Redis
-- Cloudinary account (for file storage)
+- Cloudinary account
 
-### Installation
+### Backend Setup
 
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd music-player-api
+   cd MusicPlayerApplication
    ```
 
-2. **Install and Start MongoDB**
-   ```bash
-   # Ubuntu/Debian
-   sudo apt install mongodb
-   sudo systemctl start mongodb
+2. **Configure environment variables**
+   Create `src/main/resources/application.properties`:
+   ```properties
+   # Database
+   spring.data.mongodb.uri=mongodb://localhost:27017/musicplayer
    
-   # macOS
-   brew install mongodb/brew/mongodb-community
-   brew services start mongodb/brew/mongodb-community
-   ```
-
-3. **Install and Start Redis**
-   ```bash
-   # Ubuntu/Debian
-   sudo apt install redis-server
-   sudo systemctl start redis
+   # Redis
+   spring.redis.host=localhost
+   spring.redis.port=6379
    
-   # macOS
-   brew install redis
-   brew services start redis
+   # JWT
+   jwt.secret=your-secret-key-here
+   jwt.expiration=86400000
+   
+   # Cloudinary
+   cloudinary.cloud-name=your-cloud-name
+   cloudinary.api-key=your-api-key
+   cloudinary.api-secret=your-api-secret
    ```
 
-4. **Configure Environment Variables**
+3. **Run the backend**
    ```bash
-   export CLOUDINARY_CLOUD_NAME=your_cloud_name
-   export CLOUDINARY_API_KEY=your_api_key
-   export CLOUDINARY_API_SECRET=your_api_secret
-   export JWT_SECRET=your_secret_key
-   export JWT_EXPIRATION=86400000
+   ./mvnw spring-boot:run
    ```
+   The backend will start on `http://localhost:8080`
 
-5. **Build and Run**
+### Frontend Setup
+
+1. **Navigate to frontend directory**
    ```bash
-   mvn clean install
-   mvn spring-boot:run
+   cd frontend
    ```
 
-The API will be available at `http://localhost:8080`
-
-## Authentication
-
-### Register User (Default: USER role)
-```http
-POST /api/auth/register
-Content-Type: application/json
-
-{
-    "username": "john_doe",
-    "email": "john@example.com",
-    "password": "password123"
-}
-```
-
-### Create Admin
-```http
-POST /api/auth/create-admin
-Content-Type: application/json
-
-{
-    "username": "admin",
-    "email": "admin@example.com",
-    "password": "admin123"
-}
-```
-
-### Login
-```http
-POST /api/auth/login
-Content-Type: application/json
-
-{
-    "username": "john_doe",
-    "password": "password123"
-}
-```
-
-**Response:**
-```json
-{
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "username": "john_doe",
-    "role": "USER",
-    "message": "Authentication successful"
-}
-```
-
-## API Endpoints
-
-All protected endpoints require the Authorization header:
-```http
-Authorization: Bearer <your_jwt_token>
-```
-
-### Admin Endpoints (ADMIN role required)
-
-#### Admin Dashboard
-```http
-GET /api/admin/dashboard
-Authorization: Bearer <admin_token>
-```
-
-#### Upload Song
-```http
-POST /api/admin/songs/upload
-Authorization: Bearer <admin_token>
-Content-Type: multipart/form-data
-
-Form Data:
-- file: [MP3 file]
-- title: "Song Title"
-- artist: "Artist Name"
-```
-
-#### Get All Users
-```http
-GET /api/admin/users
-Authorization: Bearer <admin_token>
-```
-
-#### Delete Song
-```http
-DELETE /api/admin/songs/{songId}
-Authorization: Bearer <admin_token>
-```
-
-#### Update Song
-```http
-PUT /api/admin/songs/{songId}
-Authorization: Bearer <admin_token>
-Content-Type: application/json
-
-{
-    "title": "Updated Title",
-    "artist": "Updated Artist",
-    "isFavorite": false
-}
-```
-
-#### Toggle User Status
-```http
-PUT /api/admin/users/{userId}/status
-Authorization: Bearer <admin_token>
-```
-
-#### Delete User
-```http
-DELETE /api/admin/users/{userId}
-Authorization: Bearer <admin_token>
-```
-
-### User Endpoints (USER role required)
-
-#### Get All Songs
-```http
-GET /api/user/songs
-Authorization: Bearer <user_token>
-```
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server**
+   ```bash
+   npm run dev
+   ```
+   The frontend will start on `http://localhost:5173`
+
+## 🔐 Authentication
+
+### Demo Admin Credentials
+- **Username**: `sahilkumarclass10` or `sahilkumarclass@gmail.com`
+- **Password**: `Sahil@2003`
+
+### User Registration
+- Regular users can register through the frontend
+- Admin users can be created using the `/api/auth/create-admin` endpoint
+
+## 📡 API Endpoints
+
+### Authentication
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - User login
+- `POST /api/auth/create-admin` - Create admin user
+
+### Songs (User & Admin)
+- `GET /api/songs` - Get all songs
+- `GET /api/songs/{id}` - Get song by ID
+- `PUT /api/songs/{id}/favorite` - Toggle favorite status
+- `GET /api/user/songs/favorites` - Get user's favorite songs
+
+### Songs (Admin Only)
+- `POST /api/songs/upload` - Upload new song
+- `PUT /api/songs/{id}` - Update song
+- `DELETE /api/songs/{id}` - Delete song
+
+### Admin Management
+- `GET /api/admin/dashboard` - Get dashboard statistics
+- `GET /api/admin/users` - Get all users
+- `PUT /api/admin/users/{id}/status` - Toggle user status
+- `DELETE /api/admin/users/{id}` - Delete user
+- `GET /api/admin/cache/stats` - Get cache statistics
+- `POST /api/admin/rate-limit/reset/{identifier}` - Reset rate limit
+
+### Health Check
+- `GET /api/health` - System health status
+
+## 🎵 Music Player Features
+
+- **Play/Pause**: Control playback
+- **Seek**: Navigate through song timeline
+- **Volume Control**: Adjust audio volume
+- **Favorites**: Add/remove songs from favorites
+- **Search**: Find songs by title or artist
+- **Queue Management**: Add songs to playlist
+
+## 🎨 UI Features
+
+- **Responsive Design**: Works on desktop, tablet, and mobile
+- **Dark/Light Theme**: Toggle between themes
+- **Loading States**: Skeleton loaders and spinners
+- **Toast Notifications**: User feedback for actions
+- **Form Validation**: Client-side validation with error messages
+- **Accessibility**: ARIA labels and keyboard navigation
+
+## 🔧 Configuration
+
+### Backend Configuration
+- **CORS**: Configured for frontend integration
+- **Rate Limiting**: Configurable per endpoint
+- **Caching**: Redis-based caching for songs
+- **Security**: JWT-based authentication with role-based access
+
+### Frontend Configuration
+- **API Base URL**: Configured in `src/services/api.ts`
+- **Environment Variables**: Use `.env` file for configuration
+- **Build Optimization**: Vite for fast development and optimized builds
+
+## 🚀 Deployment
+
+### Backend Deployment
+1. Build the JAR file:
+   ```bash
+   ./mvnw clean package
+   ```
+2. Run the JAR:
+   ```bash
+   java -jar target/music-player-0.0.1-SNAPSHOT.jar
+   ```
+
+### Frontend Deployment
+1. Build for production:
+   ```bash
+   cd frontend
+   npm run build
+   ```
+2. Deploy the `dist` folder to your hosting service
+
+## 🧪 Testing
 
-#### Get Song by ID
-```http
-GET /api/user/songs/{songId}
-Authorization: Bearer <user_token>
-```
-
-#### Toggle Favorite
-```http
-PUT /api/user/songs/{songId}/favorite
-Authorization: Bearer <user_token>
-```
-
-#### Get Favorite Songs
-```http
-GET /api/user/songs/favorites
-Authorization: Bearer <user_token>
-```
-
-### General Song Endpoints (Both ADMIN and USER)
-
-#### Get All Songs
-```http
-GET /api/songs
-Authorization: Bearer <token>
-```
-
-#### Get Song by ID
-```http
-GET /api/songs/{songId}
-Authorization: Bearer <token>
-```
-
-## Redis Caching
-
-Redis is integrated to cache frequently accessed song data, significantly improving performance and reducing database load.
-
-### What is Cached?
-
-- ✅ **All Songs** - `GET /api/user/songs`
-- ✅ **Song by ID** - `GET /api/user/songs/{songId}`
-
-### Configuration
-
-Located in: `src/main/java/com/sahil/musicplyer/config/RedisConfig.java`
-
-```java
-@Bean
-public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
-    RedisTemplate<String, Object> template = new RedisTemplate<>();
-    template.setConnectionFactory(connectionFactory);
-    template.setKeySerializer(new StringRedisSerializer());
-    template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-    return template;
-}
-```
-
-### Service Layer Implementation
-
-Example in `SongServiceImpl.java`:
-
-```java
-@Cacheable(value = "songs")
-public List<Song> getAllSongs() {
-    return songRepository.findAll();
-}
-
-@Cacheable(value = "song", key = "#songId")
-public Song getSongById(String songId) {
-    return songRepository.findById(songId).orElseThrow();
-}
-```
-
-### Cache Eviction
-
-Cache is automatically invalidated when admin actions modify data:
-
-```java
-@CacheEvict(value = "songs", allEntries = true)
-public void uploadSong(...) {
-    // Invalidate cache after new upload
-}
-```
-
-### Redis Configuration
-
-Spring Boot auto-connects to Redis at `localhost:6379`. To customize, add to `application.properties`:
-
-```properties
-spring.cache.type=redis
-spring.redis.host=localhost
-spring.redis.port=6379
-spring.redis.password=your_password
-spring.redis.timeout=2000ms
-```
-
-## Security
-
-### Security Features
-
-1. **JWT Token Authentication** - All protected endpoints require valid JWT tokens
-2. **Role-Based Access Control**:
-   - **ADMIN**: Upload, update, delete songs and manage users
-   - **USER**: View songs and manage favorites
-3. **Password Encryption** - BCrypt hashing for all passwords
-4. **CORS Configuration** - Configured for frontend integration
-5. **Session Management** - Stateless authentication using JWT
-
-### Token Management
-
-- **Token Expiration**: 24 hours by default
-- **Token Storage**: Store securely in localStorage or httpOnly cookies
-- **Token Refresh**: Implement token refresh mechanism as needed
-
-## Error Handling
-
-### Common Error Responses
-
-#### 401 Unauthorized
-```json
-{
-    "error": "Authentication failed: Invalid credentials"
-}
-```
-
-#### 403 Forbidden
-```json
-{
-    "error": "Access denied: Insufficient privileges"
-}
-```
-
-#### 404 Not Found
-```json
-{
-    "error": "Song not found with id: 123"
-}
-```
-
-#### 400 Bad Request
-```json
-{
-    "error": "Invalid request data",
-    "details": "Username is required"
-}
-```
-
-## Frontend Integration
-
-### Implementation Guidelines
-
-1. **Token Storage**: Store JWT token securely in localStorage or httpOnly cookies
-2. **API Calls**: Include token in Authorization header for all protected endpoints
-3. **Token Expiration**: Handle token expiration (24 hours default)
-4. **Error Handling**: Redirect to login on 401 responses
-5. **Role-Based UI**: Show/hide features based on user role
-
-### Example JavaScript Integration
-
-```javascript
-// Store token after login
-localStorage.setItem('authToken', response.data.token);
-
-// Include token in API calls
-const token = localStorage.getItem('authToken');
-const headers = {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json'
-};
-
-// Example API call
-fetch('/api/user/songs', {
-    method: 'GET',
-    headers: headers
-})
-.then(response => response.json())
-.then(data => console.log(data))
-.catch(error => {
-    if (error.status === 401) {
-        // Redirect to login
-        window.location.href = '/login';
-    }
-});
-```
-
-## Environment Configuration
-
-### Required Environment Variables
-
+### Backend Testing
 ```bash
-# Cloudinary Configuration
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
-
-# JWT Configuration (Optional - has defaults)
-JWT_SECRET=your_secret_key
-JWT_EXPIRATION=86400000  # 24 hours in milliseconds
-
-# Database Configuration (Optional - has defaults)
-MONGODB_URI=mongodb://localhost:27017/musicplayer
-REDIS_URL=redis://localhost:6379
+./mvnw test
 ```
 
-### Application Properties
-
-```properties
-# Server Configuration
-server.port=8080
-
-# MongoDB Configuration
-spring.data.mongodb.uri=${MONGODB_URI:mongodb://localhost:27017/musicplayer}
-
-# Redis Configuration
-spring.cache.type=redis
-spring.redis.host=localhost
-spring.redis.port=6379
-
-# File Upload Configuration
-spring.servlet.multipart.max-file-size=50MB
-spring.servlet.multipart.max-request-size=50MB
-
-# JWT Configuration
-jwt.secret=${JWT_SECRET:mySecretKey}
-jwt.expiration=${JWT_EXPIRATION:86400000}
-
-# Cloudinary Configuration
-cloudinary.cloud-name=${CLOUDINARY_CLOUD_NAME}
-cloudinary.api-key=${CLOUDINARY_API_KEY}
-cloudinary.api-secret=${CLOUDINARY_API_SECRET}
-```
-
-## Performance Optimization
-
-### Redis Caching Benefits
-
-- **Reduced Database Load**: Frequently accessed songs served from memory
-- **Faster Response Times**: Redis retrieval significantly faster than database queries
-- **Scalability**: Reduces bottlenecks on primary database
-- **Cost Efficiency**: Lower database resource consumption
-
-### Monitoring
-
-Monitor cache performance:
+### Frontend Testing
 ```bash
-# Redis CLI commands
-redis-cli info memory
-redis-cli keys "*"
-redis-cli monitor  # Real-time monitoring
+cd frontend
+npm test
 ```
 
-## Development
+## 📊 Monitoring
 
-### Project Structure
+- **Health Checks**: `/api/health` endpoint
+- **Cache Statistics**: `/api/admin/cache/stats` (Admin only)
+- **Rate Limit Monitoring**: Built-in rate limiting with statistics
 
-```
-src/
-├── main/
-│   ├── java/
-│   │   └── com/sahil/musicplyer/
-│   │       ├── config/          # Configuration classes
-│   │       ├── controller/      # REST controllers
-│   │       ├── dto/            # Data Transfer Objects
-│   │       ├── entity/         # Entity classes
-│   │       ├── repository/     # Data repositories
-│   │       ├── service/        # Business logic
-│   │       └── security/       # Security configuration
-│   └── resources/
-│       └── application.properties
-└── test/                       # Test classes
-```
-
-### Running Tests
-
-```bash
-mvn test
-```
-
-### Building for Production
-
-```bash
-mvn clean package -Pprod
-java -jar target/music-player-api-1.0.0.jar
-```
-
-## Contributing
+## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
-### Coding Standards
+## 📝 License
 
-- Follow Java naming conventions
-- Write unit tests for new features
-- Update documentation for API changes
-- Use meaningful commit messages
+This project is licensed under the MIT License.
 
-## Troubleshooting
+## 🆘 Support
 
-### Common Issues
+If you encounter any issues:
+1. Check the logs for error messages
+2. Verify your configuration
+3. Ensure all services (MongoDB, Redis) are running
+4. Check the API documentation at `/swagger-ui.html`
 
-1. **Redis Connection Failed**
-   - Ensure Redis server is running: `redis-server`
-   - Check connection settings in application.properties
+## 🔄 Updates
 
-2. **MongoDB Connection Issues**
-   - Verify MongoDB is running: `sudo systemctl status mongodb`
-   - Check database URI in configuration
-
-3. **File Upload Errors**
-   - Verify Cloudinary credentials
-   - Check file size limits
-   - Ensure proper multipart configuration
-
-4. **Authentication Issues**
-   - Verify JWT secret configuration
-   - Check token expiration settings
-   - Ensure proper Authorization header format
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Support
-
-For support and questions:
-- Create an issue in the repository
-- Check the documentation
-- Review the troubleshooting section
+- **Backend**: Update dependencies in `pom.xml`
+- **Frontend**: Update dependencies in `frontend/package.json`
 
 ---
 
-**Built with ❤️ using Spring Boot, MongoDB, and Redis**
+**Happy Coding! 🎵**
