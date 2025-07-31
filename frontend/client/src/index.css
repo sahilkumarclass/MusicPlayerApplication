@@ -1,0 +1,139 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(20, 14.3%, 4.1%);
+  --muted: hsl(60, 4.8%, 95.9%);
+  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(20, 14.3%, 4.1%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(20, 14.3%, 4.1%);
+  --border: hsl(20, 5.9%, 90%);
+  --input: hsl(20, 5.9%, 90%);
+  --primary: hsl(271, 81%, 56%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(60, 4.8%, 95.9%);
+  --secondary-foreground: hsl(24, 9.8%, 10%);
+  --accent: hsl(217, 91%, 60%);
+  --accent-foreground: hsl(0, 0%, 100%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(20, 14.3%, 4.1%);
+  --radius: 0.5rem;
+  
+  /* Music Player Theme */
+  --music-primary: hsl(271, 81%, 56%);
+  --music-secondary: hsl(281, 75%, 67%);
+  --music-dark: hsl(0, 0%, 5.9%);
+  --music-gray: hsl(0, 0%, 10.2%);
+  --music-card: hsl(0, 0%, 14.9%);
+  --music-accent: hsl(217, 91%, 60%);
+  --music-success: hsl(142, 76%, 36%);
+  --music-error: hsl(0, 84%, 60%);
+}
+
+.dark {
+  --background: hsl(0, 0%, 5.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(0, 0%, 14.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(0, 0%, 5.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(0, 0%, 14.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(271, 81%, 56%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(217, 91%, 60%);
+  --accent-foreground: hsl(0, 0%, 100%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased text-foreground;
+    background-color: var(--music-dark);
+    color: white;
+    overflow-x: hidden;
+  }
+}
+
+@layer utilities {
+  .bg-music-primary {
+    background-color: var(--music-primary);
+  }
+  .bg-music-secondary {
+    background-color: var(--music-secondary);
+  }
+  .bg-music-dark {
+    background-color: var(--music-dark);
+  }
+  .bg-music-gray {
+    background-color: var(--music-gray);
+  }
+  .bg-music-card {
+    background-color: var(--music-card);
+  }
+  .bg-music-accent {
+    background-color: var(--music-accent);
+  }
+  .bg-music-success {
+    background-color: var(--music-success);
+  }
+  .bg-music-error {
+    background-color: var(--music-error);
+  }
+  
+  .text-music-primary {
+    color: var(--music-primary);
+  }
+  .text-music-secondary {
+    color: var(--music-secondary);
+  }
+  .text-music-accent {
+    color: var(--music-accent);
+  }
+  .text-music-success {
+    color: var(--music-success);
+  }
+  .text-music-error {
+    color: var(--music-error);
+  }
+  
+  .border-music-primary {
+    border-color: var(--music-primary);
+  }
+  .border-music-accent {
+    border-color: var(--music-accent);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--music-gray);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--music-card);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(0, 0%, 30%);
+}
